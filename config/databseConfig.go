@@ -78,4 +78,7 @@ func ConnectDatabase() {
 	}
 
 	log.Println("✅ Tables migrated successfully")
+
+	SeedLocationFromExcel(DB)
+
 }
