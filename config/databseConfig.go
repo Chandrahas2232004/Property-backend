@@ -59,17 +59,16 @@ func ConnectDatabase() {
 		// core tables
 		&models.User{},
 		&models.Property{},
-		&models.Assets{},
-		&models.Contracts{},
+		&models.Asset{},
+		&models.Contract{},
 		&models.Agreement{},
 
-		// child tables
+		// property related child tables
 		&models.UserRoles{},
 		&models.PropertyLandDetails{},
 		&models.PropertyBuildingDetails{},
 		&models.PropertyTaxDetails{},
 		&models.PropertyOwnershipDetails{},
-		&models.PropertyDocuments{},
 		&models.PropertyMedia{},
 	)
 
@@ -78,7 +77,4 @@ func ConnectDatabase() {
 	}
 
 	log.Println("✅ Tables migrated successfully")
-
-	SeedLocationFromExcel(DB)
-
 }

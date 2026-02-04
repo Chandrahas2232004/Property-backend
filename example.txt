@@ -1,0 +1,93 @@
+PROPERTY API - ADD PROPERTY REQUEST EXAMPLE
+=============================================
+
+Endpoint: POST /api/v1/properties
+Content-Type: application/json
+
+REQUEST BODY (Complete Example):
+{
+  "property_name": "Heritage Villa",
+  "property_type_name": "residential",
+  "value": "5000000",
+  "income": "50000",
+  "original_deed": "yes",
+  "user_id": 1,
+  
+  "country_name": "India",
+  "state_name": "Karnataka",
+  "district_name": "Bangalore",
+  "taluk_name": "Whitefield",
+  "hobli": "Horamavu",
+  "village": "Chelekere",
+  "street_address": "123 Main Street, Bangalore",
+  "pincode": "560067",
+  "lat_coordinate": "12.9698",
+  "long_coordinate": "77.7499",
+  
+  "rtc": "123",
+  "ec": "456",
+  "syno": "78/A",
+  "khatano": "2023-45",
+  "mrno": "789",
+  "acre": "2.5",
+  "gunte": "100",
+  "karab": "50",
+  "converted": "yes",
+  "purpose": "residential",
+  
+  "receipt_no": "TAX2024001",
+  "prev_amount": 5000.00,
+  "curr_amount": 5500.00,
+  "receipt_link": "https://example.com/receipt.pdf",
+  
+  "received_from": "John Doe",
+  "acquisition_type": "purchase",
+  "registration_details": "Registration Number: REG2023001",
+  "title": "Absolute Owner",
+  
+  "plot_size": "2500 sq.ft",
+  "built_up_area": "1800 sq.ft",
+  "year_of_construction": "2015",
+  
+  "scanned_deed_link": "https://example.com/deed.pdf",
+  "photo_link": "https://example.com/photo.jpg"
+}
+
+RESPONSE (Success - 201 Created):
+{
+  "id": 1
+}
+
+RESPONSE (Error - 400 Bad Request):
+{
+  "error": "Key: 'AddProperty.property_name' Error:Field validation for 'property_name' failed on the 'required' tag"
+}
+
+NOTES:
+------
+1. Required fields:
+   - property_name
+   - user_id
+
+2. Location hierarchy must be provided in order:
+   - country_name → state_name → district_name → taluk_name (auto-created if not exist)
+
+3. If PropertyTypeID is not provided, PropertyTypeName will be used to lookup or create the type
+
+4. All related records are created in a single transaction:
+   - property_land_details
+   - property_tax_details
+   - property_ownership_details
+   - property_building_details
+   - property_media
+
+5. The transaction ensures data integrity - all records are created together or rolled back on failure
+
+API ENDPOINTS:
+--------------
+GET  /api/v1/properties/total                    - Get total properties count
+GET  /api/v1/properties/active-rental/count      - Get active rental properties count
+POST /api/v1/properties                          - Add new property with all details
+GET  /api/v1/properties/agricultural             - List agricultural properties
+GET  /api/v1/properties/residential              - List residential properties
+GET  /api/v1/properties/commercial               - List commercial properties
