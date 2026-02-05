@@ -71,6 +71,7 @@ func main() {
 		contractController,
 	)
 
+	
 	// Start server
 	r.Run(":8080")
 }
