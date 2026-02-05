@@ -32,8 +32,9 @@ func ConnectDatabase() {
 		os.Getenv("DB_SSLMODE"),
 	)
 
-	// ✅ OPEN DB ONLY ONCE
+	// ✅ OPEN DB ONLY ONCE (WITH LOGGER)
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger:                                   NewDBLogger(), // ✅ logs to file
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 	if err != nil {
@@ -77,4 +78,7 @@ func ConnectDatabase() {
 	}
 
 	log.Println("✅ Tables migrated successfully")
+
+	// optional seed
+	// SeedLocationFromExcel(DB)
 }

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"io"
+	
 	"log"
-	"os"
+	
 
 	"github.com/gin-gonic/gin"
 
@@ -19,20 +19,19 @@ import (
 )
 
 func main() {
-	// setup logging to stdout and app.log
-	logFile, err := os.OpenFile("docs/app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-	if err != nil {
-		log.Printf("could not open log file: %v", err)
-	} else {
-		mw := io.MultiWriter(os.Stdout, logFile)
-		log.SetOutput(mw)
-	}
+	
 
-	// Initialize DB via GORM and config
+	/// ✅ INIT FILE LOGGING FIRST
+	config.InitFileLogger()
+
+	log.Println("🚀 Application starting...")
+	// connect database
 	config.ConnectDatabase()
-	db := config.DB
 
+	// setup gin
 	r := gin.Default()
+    db := config.DB
+	
 
 	// Swagger endpoint
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -72,6 +71,14 @@ func main() {
 	)
 
 	
-	// Start server
-	r.Run(":8080")
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status": "ok",
+		})
+	})
+
+	log.Println("🚀 Server running on :8080")
+	if err := r.Run(":8080"); err != nil {
+		log.Fatal(err)
+	}
 }
