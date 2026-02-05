@@ -1,5 +1,6 @@
 .env
 app.exe
-#example.txt
-#app.log
-villages-directory.xlsx
+*.log
+*.xlsx
+example.txt
+logs/
