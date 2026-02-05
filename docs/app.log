@@ -1,0 +1,51 @@
+2026/02/02 14:40:57 ✅ Database connected
+2026/02/02 14:40:57 ✅ Tables migrated successfully
+2026/02/02 14:45:07 ✅ Database connected
+2026/02/02 14:45:07 ✅ Tables migrated successfully
+2026/02/02 14:47:15 ✅ Database connected
+2026/02/02 14:47:15 ✅ Tables migrated successfully
+2026/02/02 14:49:44 ✅ Database connected
+2026/02/02 14:49:44 ✅ Tables migrated successfully
+2026/02/02 15:25:58 ✅ Database connected
+2026/02/02 15:25:58 ✅ Tables migrated successfully
+2026/02/02 16:36:11 ✅ Database connected
+2026/02/02 16:36:11 ✅ Tables migrated successfully
+2026/02/02 16:37:40 ✅ Database connected
+2026/02/02 16:37:40 ✅ Tables migrated successfully
+2026/02/02 16:40:14 ✅ Database connected
+2026/02/02 16:40:15 ✅ Tables migrated successfully
+2026/02/03 10:48:03 ✅ Database connected
+2026/02/03 10:48:03 ✅ Tables migrated successfully
+2026/02/03 13:42:09 ✅ Database connected
+2026/02/03 13:42:10 ✅ Tables migrated successfully
+2026/02/03 13:46:29 ✅ Database connected
+2026/02/03 13:46:30 ✅ Tables migrated successfully
+2026/02/03 13:46:30 ✅ Seeded property type: residential
+2026/02/03 13:46:30 ✅ Seeded property type: commercial
+2026/02/03 13:46:30 ✅ Seeded property type: agricultural
+2026/02/03 13:49:45 ✅ Database connected
+2026/02/03 13:49:45 ✅ Tables migrated successfully
+2026/02/03 13:50:47 ✅ Database connected
+2026/02/03 13:50:47 ✅ Tables migrated successfully
+2026/02/03 14:26:22 ✅ Database connected
+2026/02/03 14:26:22 ✅ Tables migrated successfully
+2026/02/03 14:26:22 🌱 Seeding sample property data...
+2026/02/03 14:26:22 ✅ Seeded property: Green Valley Estate
+2026/02/03 14:26:22 ✅ Seeded property: Sunshine Commercial Complex
+2026/02/03 14:26:22 ✅ Seeded property: Farmland Paradise
+2026/02/03 14:26:22 ✅ Sample property data seeding completed
+2026/02/03 14:35:00 ✅ Database connected
+2026/02/03 14:35:00 ✅ Tables migrated successfully
+2026/02/03 14:35:00 ✅ Seeded property type: residential
+2026/02/03 14:35:00 ✅ Seeded property type: commercial
+2026/02/03 14:35:00 ✅ Seeded property type: agricultural
+2026/02/03 14:35:00 ⏭️  Properties already seeded, skipping...
+2026/02/03 14:35:29 ✅ Database connected
+2026/02/03 14:35:30 ✅ Tables migrated successfully
+2026/02/03 14:35:30 ⏭️  Properties already seeded, skipping...
+2026/02/04 10:54:18 ✅ Database connected
+2026/02/04 10:54:18 ✅ Tables migrated successfully
+2026/02/04 11:18:05 ✅ Database connected
+2026/02/04 11:18:05 ✅ Tables migrated successfully
+2026/02/04 19:00:59 ✅ Database connected
+2026/02/04 19:00:59 ✅ Tables migrated successfully

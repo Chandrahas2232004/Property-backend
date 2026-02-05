@@ -1,0 +1,468 @@
+definitions:
+  models.Address:
+    properties:
+      address_id:
+        type: integer
+      hobli:
+        type: string
+      lat_coordinate:
+        type: string
+      long_coordinate:
+        type: string
+      pincode:
+        type: string
+      street_address:
+        type: string
+      taluk:
+        $ref: '#/definitions/models.TalukMaster'
+      taluk_id:
+        type: integer
+      village:
+        type: string
+    type: object
+  models.Agreement:
+    properties:
+      agreement_id:
+        type: integer
+      contact_no:
+        type: string
+      created_at:
+        type: string
+      deposit:
+        type: number
+      end_date:
+        type: string
+      property:
+        allOf:
+        - $ref: '#/definitions/models.Property'
+        description: relation
+      property_id:
+        type: integer
+      rent:
+        type: number
+      start_date:
+        type: string
+      tenant_name:
+        type: string
+    type: object
+  models.Asset:
+    properties:
+      amc_provider:
+        type: string
+      asset_id:
+        type: integer
+      asset_name:
+        type: string
+      asset_type:
+        $ref: '#/definitions/models.AssetTypeMaster'
+      asset_type_id:
+        description: foreign key → asset_type_master
+        type: integer
+      cost:
+        type: string
+      created_at:
+        type: string
+      end_date:
+        type: string
+      location:
+        type: string
+      property:
+        allOf:
+        - $ref: '#/definitions/models.Property'
+        description: relations
+      property_id:
+        description: foreign key → property
+        type: integer
+      start_date:
+        type: string
+    type: object
+  models.AssetTypeMaster:
+    properties:
+      asset_type_id:
+        type: integer
+      asset_type_name:
+        type: string
+    type: object
+  models.Contract:
+    properties:
+      asset:
+        allOf:
+        - $ref: '#/definitions/models.Asset'
+        description: relations
+      asset_id:
+        description: foreign key → assets
+        type: integer
+      contract_id:
+        type: integer
+      contract_type:
+        $ref: '#/definitions/models.ContractTypeMaster'
+      contract_type_id:
+        description: foreign key → contract_type_master
+        type: integer
+      cost:
+        type: number
+      end_date:
+        type: string
+      name:
+        type: string
+      provider:
+        type: string
+      related_to:
+        type: string
+      start_date:
+        type: string
+      terms:
+        type: string
+    type: object
+  models.ContractTypeMaster:
+    properties:
+      contract_type_id:
+        type: integer
+      contract_type_name:
+        type: string
+    type: object
+  models.CountryMaster:
+    properties:
+      country_id:
+        type: integer
+      country_name:
+        type: string
+    type: object
+  models.DistrictMaster:
+    properties:
+      district_id:
+        type: integer
+      district_name:
+        type: string
+      state:
+        $ref: '#/definitions/models.StateMaster'
+      state_id:
+        type: integer
+    type: object
+  models.Property:
+    properties:
+      address:
+        allOf:
+        - $ref: '#/definitions/models.Address'
+        description: relations (FKs live ONLY here — correct direction)
+      address_id:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      income:
+        type: string
+      original_deed:
+        type: string
+      property_id:
+        type: integer
+      property_name:
+        type: string
+      property_type:
+        $ref: '#/definitions/models.PropertyTypeMaster'
+      property_type_id:
+        type: integer
+      purpose:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      user_id:
+        type: integer
+      value:
+        type: string
+    type: object
+  models.PropertyTypeMaster:
+    properties:
+      property_type_id:
+        type: integer
+      property_type_name:
+        type: string
+    type: object
+  models.RolesMaster:
+    properties:
+      role:
+        type: string
+      roles_master_id:
+        type: integer
+    type: object
+  models.StateMaster:
+    properties:
+      country:
+        $ref: '#/definitions/models.CountryMaster'
+      country_id:
+        type: integer
+      state_id:
+        type: integer
+      state_name:
+        type: string
+    type: object
+  models.TalukMaster:
+    properties:
+      district:
+        $ref: '#/definitions/models.DistrictMaster'
+      district_id:
+        type: integer
+      taluk_id:
+        type: integer
+      taluk_name:
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      phone_number:
+        type: string
+      role:
+        $ref: '#/definitions/models.RolesMaster'
+      role_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/agreements:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Agreement'
+            type: array
+      summary: Get all agreements
+      tags:
+      - Agreements
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a rental agreement
+      tags:
+      - Agreements
+  /api/v1/assets:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Asset'
+            type: array
+      summary: Get all assets
+      tags:
+      - Assets
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create an asset
+      tags:
+      - Assets
+  /api/v1/auth/signin:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Sign in a user
+      tags:
+      - Auth
+  /api/v1/auth/signup:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Sign up a new user
+      tags:
+      - Auth
+  /api/v1/contracts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Contract'
+            type: array
+      summary: Get all contracts
+      tags:
+      - Contracts
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a contract
+      tags:
+      - Contracts
+  /api/v1/contracts/amc:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Contract'
+            type: array
+      summary: Get all AMC contracts
+      tags:
+      - Contracts
+  /api/v1/contracts/lease:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Contract'
+            type: array
+      summary: Get all lease contracts
+      tags:
+      - Contracts
+  /api/v1/properties:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Add a new property
+      tags:
+      - Properties
+  /api/v1/properties/active-rental/count:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get active rental properties count
+      tags:
+      - Properties
+  /api/v1/properties/agricultural:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Property'
+            type: array
+      summary: List agricultural land properties
+      tags:
+      - Properties
+  /api/v1/properties/commercial:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Property'
+            type: array
+      summary: List commercial land properties
+      tags:
+      - Properties
+  /api/v1/properties/residential:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Property'
+            type: array
+      summary: List residential land properties
+      tags:
+      - Properties
+  /api/v1/properties/total:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get total properties count
+      tags:
+      - Properties
+swagger: "2.0"
