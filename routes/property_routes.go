@@ -9,6 +9,15 @@ import (
 func PropertyRoutes(rg *gin.RouterGroup, controller *controllers.PropertyController) {
 	props := rg.Group("/properties")
 	{
+
+		// Add property
+		// @Summary Add a new property
+		// @Tags Properties
+		// @Accept json
+		// @Produce json
+		// @Router /api/v1/properties [post]
+		props.POST("", controller.AddProperty)
+		
 		// Total properties
 		// @Summary Get total properties count
 		// @Tags Properties
@@ -23,13 +32,7 @@ func PropertyRoutes(rg *gin.RouterGroup, controller *controllers.PropertyControl
 		// @Router /api/v1/properties/active-rental/count [get]
 		props.GET("/active-rental/count", controller.ActiveRentalPropertyCount)
 
-		// Add property
-		// @Summary Add a new property
-		// @Tags Properties
-		// @Accept json
-		// @Produce json
-		// @Router /api/v1/properties [post]
-		props.POST("", controller.AddProperty)
+
 
 		// Agricultural properties
 		// @Summary List agricultural land properties
@@ -51,5 +54,7 @@ func PropertyRoutes(rg *gin.RouterGroup, controller *controllers.PropertyControl
 		// @Produce json
 		// @Router /api/v1/properties/commercial [get]
 		props.GET("/commercial", controller.CommercialLandProperties)
+
+		
 	}
 }

@@ -237,6 +237,113 @@
                 }
             }
         },
+        "/api/v1/form/country": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Form"
+                ],
+                "summary": "Get all countries",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/form/district/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Form"
+                ],
+                "summary": "Get districts by state ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "State ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/form/state/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Form"
+                ],
+                "summary": "Get states by country ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Country ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/form/taluk/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Form"
+                ],
+                "summary": "Get taluks by district ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "District ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/properties": {
             "post": {
                 "consumes": [
@@ -248,7 +355,7 @@
                 "tags": [
                     "Properties"
                 ],
-                "summary": "Add a new property",
+                "summary": "Add a new property with all details",
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -443,13 +550,25 @@
         "models.Asset": {
             "type": "object",
             "properties": {
-                "amc_provider": {
+                "asset_amc_provider": {
+                    "type": "string"
+                },
+                "asset_cost": {
+                    "type": "string"
+                },
+                "asset_end_date": {
                     "type": "string"
                 },
                 "asset_id": {
                     "type": "integer"
                 },
+                "asset_location": {
+                    "type": "string"
+                },
                 "asset_name": {
+                    "type": "string"
+                },
+                "asset_start_date": {
                     "type": "string"
                 },
                 "asset_type": {
@@ -459,16 +578,7 @@
                     "description": "foreign key → asset_type_master",
                     "type": "integer"
                 },
-                "cost": {
-                    "type": "string"
-                },
                 "created_at": {
-                    "type": "string"
-                },
-                "end_date": {
-                    "type": "string"
-                },
-                "location": {
                     "type": "string"
                 },
                 "property": {
@@ -482,9 +592,6 @@
                 "property_id": {
                     "description": "foreign key → property",
                     "type": "integer"
-                },
-                "start_date": {
-                    "type": "string"
                 }
             }
         },
@@ -590,27 +697,34 @@
             "type": "object",
             "properties": {
                 "address": {
-                    "description": "relations (FKs live ONLY here — correct direction)",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.Address"
-                        }
-                    ]
+                    "$ref": "#/definitions/models.Address"
                 },
                 "address_id": {
                     "type": "integer"
                 },
-                "created_at": {
-                    "type": "string"
+                "buildingDetails": {
+                    "$ref": "#/definitions/models.PropertyBuildingDetails"
                 },
-                "description": {
+                "created_at": {
                     "type": "string"
                 },
                 "income": {
                     "type": "string"
                 },
+                "landDetails": {
+                    "$ref": "#/definitions/models.PropertyLandDetails"
+                },
+                "media": {
+                    "$ref": "#/definitions/models.PropertyMedia"
+                },
                 "original_deed": {
                     "type": "string"
+                },
+                "ownership": {
+                    "$ref": "#/definitions/models.PropertyOwnershipDetails"
+                },
+                "propertyType": {
+                    "$ref": "#/definitions/models.PropertyTypeMaster"
                 },
                 "property_id": {
                     "type": "integer"
@@ -618,23 +732,174 @@
                 "property_name": {
                     "type": "string"
                 },
-                "property_type": {
-                    "$ref": "#/definitions/models.PropertyTypeMaster"
-                },
                 "property_type_id": {
                     "type": "integer"
                 },
-                "purpose": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/models.User"
+                "taxDetails": {
+                    "$ref": "#/definitions/models.PropertyTaxDetails"
                 },
                 "user_id": {
                     "type": "integer"
                 },
                 "value": {
                     "type": "string"
+                }
+            }
+        },
+        "models.PropertyBuildingDetails": {
+            "type": "object",
+            "properties": {
+                "application_no": {
+                    "type": "string"
+                },
+                "building_details_id": {
+                    "type": "integer"
+                },
+                "built_up_area": {
+                    "type": "string"
+                },
+                "plot_size": {
+                    "type": "string"
+                },
+                "property": {
+                    "$ref": "#/definitions/models.Property"
+                },
+                "property_id": {
+                    "type": "integer"
+                },
+                "year_of_construction": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PropertyLandDetails": {
+            "type": "object",
+            "properties": {
+                "acre": {
+                    "type": "string"
+                },
+                "converted": {
+                    "type": "string"
+                },
+                "ec": {
+                    "type": "string"
+                },
+                "gunte": {
+                    "type": "string"
+                },
+                "karab": {
+                    "type": "string"
+                },
+                "khata_no": {
+                    "type": "string"
+                },
+                "khuskitari": {
+                    "type": "string"
+                },
+                "land_details_id": {
+                    "type": "integer"
+                },
+                "mr_no": {
+                    "type": "string"
+                },
+                "property": {
+                    "$ref": "#/definitions/models.Property"
+                },
+                "property_id": {
+                    "type": "integer"
+                },
+                "purpose": {
+                    "type": "string"
+                },
+                "rtc": {
+                    "type": "string"
+                },
+                "sy_no": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PropertyMedia": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "integer"
+                },
+                "photo_link": {
+                    "type": "string"
+                },
+                "property": {
+                    "$ref": "#/definitions/models.Property"
+                },
+                "property_id": {
+                    "type": "integer"
+                },
+                "remarks": {
+                    "type": "string"
+                },
+                "scanned_deed_link": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PropertyOwnershipDetails": {
+            "type": "object",
+            "properties": {
+                "acquisition_type": {
+                    "type": "string"
+                },
+                "incharge": {
+                    "type": "string"
+                },
+                "ownership_id": {
+                    "type": "integer"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "property": {
+                    "$ref": "#/definitions/models.Property"
+                },
+                "property_id": {
+                    "type": "integer"
+                },
+                "received_from": {
+                    "type": "string"
+                },
+                "registration_details": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PropertyTaxDetails": {
+            "type": "object",
+            "properties": {
+                "property": {
+                    "$ref": "#/definitions/models.Property"
+                },
+                "property_id": {
+                    "type": "integer"
+                },
+                "receipt_no": {
+                    "type": "string"
+                },
+                "receipt_photo_link": {
+                    "type": "string"
+                },
+                "tax_amount_paid_current_year": {
+                    "type": "number"
+                },
+                "tax_amount_paid_previous_year": {
+                    "type": "number"
+                },
+                "tax_id": {
+                    "type": "integer"
+                },
+                "tax_paid": {
+                    "type": "boolean"
                 }
             }
         },
@@ -646,17 +911,6 @@
                 },
                 "property_type_name": {
                     "type": "string"
-                }
-            }
-        },
-        "models.RolesMaster": {
-            "type": "object",
-            "properties": {
-                "role": {
-                    "type": "string"
-                },
-                "roles_master_id": {
-                    "type": "integer"
                 }
             }
         },
@@ -691,35 +945,6 @@
                 },
                 "taluk_name": {
                     "type": "string"
-                }
-            }
-        },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "role": {
-                    "$ref": "#/definitions/models.RolesMaster"
-                },
-                "role_id": {
-                    "type": "integer"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         }

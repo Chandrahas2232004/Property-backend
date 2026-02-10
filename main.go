@@ -45,6 +45,7 @@ func main() {
 	agreementRepo := repositories.NewAgreementRepository(db)
 	assetRepo := repositories.NewAssetRepository(db)
 	contractRepo := repositories.NewContractRepository(db)
+	formRepo := repositories.NewFormRepository(db)
 
 	// Construct services
 	authSvc := services.NewAuthService(authRepo)
@@ -52,6 +53,7 @@ func main() {
 	agreementSvc := services.NewAgreementService(agreementRepo)
 	assetSvc := services.NewAssetService(assetRepo)
 	contractSvc := services.NewContractService(contractRepo)
+	formSvc := services.NewFormService(formRepo)
 
 	// Instantiate controllers with services
 	authController := controllers.NewAuthController(authSvc)
@@ -59,6 +61,7 @@ func main() {
 	agreementController := controllers.NewAgreementController(agreementSvc)
 	assetController := controllers.NewAssetController(assetSvc)
 	contractController := controllers.NewContractController(contractSvc)
+	formController := controllers.NewFormController(formSvc)
 
 	// Register routes under /api/v1
 	routes.RegisterRoutes(
@@ -68,6 +71,7 @@ func main() {
 		agreementController,
 		assetController,
 		contractController,
+		formController,
 	)
 
 	

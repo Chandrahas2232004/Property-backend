@@ -47,24 +47,26 @@ definitions:
     type: object
   models.Asset:
     properties:
-      amc_provider:
+      asset_amc_provider:
+        type: string
+      asset_cost:
+        type: string
+      asset_end_date:
         type: string
       asset_id:
         type: integer
+      asset_location:
+        type: string
       asset_name:
+        type: string
+      asset_start_date:
         type: string
       asset_type:
         $ref: '#/definitions/models.AssetTypeMaster'
       asset_type_id:
         description: foreign key → asset_type_master
         type: integer
-      cost:
-        type: string
       created_at:
-        type: string
-      end_date:
-        type: string
-      location:
         type: string
       property:
         allOf:
@@ -73,8 +75,6 @@ definitions:
       property_id:
         description: foreign key → property
         type: integer
-      start_date:
-        type: string
     type: object
   models.AssetTypeMaster:
     properties:
@@ -142,35 +142,140 @@ definitions:
   models.Property:
     properties:
       address:
-        allOf:
-        - $ref: '#/definitions/models.Address'
-        description: relations (FKs live ONLY here — correct direction)
+        $ref: '#/definitions/models.Address'
       address_id:
         type: integer
+      buildingDetails:
+        $ref: '#/definitions/models.PropertyBuildingDetails'
       created_at:
-        type: string
-      description:
         type: string
       income:
         type: string
+      landDetails:
+        $ref: '#/definitions/models.PropertyLandDetails'
+      media:
+        $ref: '#/definitions/models.PropertyMedia'
       original_deed:
         type: string
+      ownership:
+        $ref: '#/definitions/models.PropertyOwnershipDetails'
       property_id:
         type: integer
       property_name:
         type: string
-      property_type:
-        $ref: '#/definitions/models.PropertyTypeMaster'
       property_type_id:
         type: integer
-      purpose:
-        type: string
-      user:
-        $ref: '#/definitions/models.User'
+      propertyType:
+        $ref: '#/definitions/models.PropertyTypeMaster'
+      taxDetails:
+        $ref: '#/definitions/models.PropertyTaxDetails'
       user_id:
         type: integer
       value:
         type: string
+    type: object
+  models.PropertyBuildingDetails:
+    properties:
+      application_no:
+        type: string
+      building_details_id:
+        type: integer
+      built_up_area:
+        type: string
+      plot_size:
+        type: string
+      property:
+        $ref: '#/definitions/models.Property'
+      property_id:
+        type: integer
+      year_of_construction:
+        type: string
+    type: object
+  models.PropertyLandDetails:
+    properties:
+      acre:
+        type: string
+      converted:
+        type: string
+      ec:
+        type: string
+      gunte:
+        type: string
+      karab:
+        type: string
+      khata_no:
+        type: string
+      khuskitari:
+        type: string
+      land_details_id:
+        type: integer
+      mr_no:
+        type: string
+      property:
+        $ref: '#/definitions/models.Property'
+      property_id:
+        type: integer
+      purpose:
+        type: string
+      rtc:
+        type: string
+      sy_no:
+        type: string
+    type: object
+  models.PropertyMedia:
+    properties:
+      media_id:
+        type: integer
+      photo_link:
+        type: string
+      property:
+        $ref: '#/definitions/models.Property'
+      property_id:
+        type: integer
+      remarks:
+        type: string
+      scanned_deed_link:
+        type: string
+    type: object
+  models.PropertyOwnershipDetails:
+    properties:
+      acquisition_type:
+        type: string
+      incharge:
+        type: string
+      ownership_id:
+        type: integer
+      phone_number:
+        type: string
+      property:
+        $ref: '#/definitions/models.Property'
+      property_id:
+        type: integer
+      received_from:
+        type: string
+      registration_details:
+        type: string
+      title:
+        type: string
+    type: object
+  models.PropertyTaxDetails:
+    properties:
+      property:
+        $ref: '#/definitions/models.Property'
+      property_id:
+        type: integer
+      receipt_no:
+        type: string
+      receipt_photo_link:
+        type: string
+      tax_amount_paid_current_year:
+        type: number
+      tax_amount_paid_previous_year:
+        type: number
+      tax_id:
+        type: integer
+      tax_paid:
+        type: boolean
     type: object
   models.PropertyTypeMaster:
     properties:
@@ -178,13 +283,6 @@ definitions:
         type: integer
       property_type_name:
         type: string
-    type: object
-  models.RolesMaster:
-    properties:
-      role:
-        type: string
-      roles_master_id:
-        type: integer
     type: object
   models.StateMaster:
     properties:
@@ -207,25 +305,6 @@ definitions:
         type: integer
       taluk_name:
         type: string
-    type: object
-  models.User:
-    properties:
-      created_at:
-        type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      last_name:
-        type: string
-      phone_number:
-        type: string
-      role:
-        $ref: '#/definitions/models.RolesMaster'
-      role_id:
-        type: integer
-      user_id:
-        type: integer
     type: object
 info:
   contact: {}
@@ -382,6 +461,76 @@ paths:
       summary: Get all lease contracts
       tags:
       - Contracts
+  /api/v1/form/country:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all countries
+      tags:
+      - Form
+  /api/v1/form/district/{id}:
+    get:
+      parameters:
+      - description: State ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get districts by state ID
+      tags:
+      - Form
+  /api/v1/form/state/{id}:
+    get:
+      parameters:
+      - description: Country ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get states by country ID
+      tags:
+      - Form
+  /api/v1/form/taluk/{id}:
+    get:
+      parameters:
+      - description: District ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get taluks by district ID
+      tags:
+      - Form
   /api/v1/properties:
     post:
       consumes:
@@ -394,7 +543,7 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Add a new property
+      summary: Add a new property with all details
       tags:
       - Properties
   /api/v1/properties/active-rental/count:

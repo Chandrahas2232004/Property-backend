@@ -12,6 +12,7 @@ func RegisterRoutes(api *gin.RouterGroup,
 	agreementController *controllers.AgreementController,
 	assetController *controllers.AssetController,
 	contractController *controllers.ContractController,
+	formController *controllers.FormController,
 ) {
 	// domain-specific routes
 	AuthRoutes(api, authController)
@@ -19,4 +20,5 @@ func RegisterRoutes(api *gin.RouterGroup,
 	AgreementRoutes(api, agreementController)
 	AssetRoutes(api, assetController)
 	ContractRoutes(api, contractController)
+	FormRoutes(api, formController)
 }
