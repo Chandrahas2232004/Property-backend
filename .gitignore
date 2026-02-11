@@ -1,6 +1,4 @@
 .env
 app.exe
 *.log
-*.xlsx
 example.txt
-logs/

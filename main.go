@@ -32,6 +32,8 @@ func main() {
 	r := gin.Default()
     db := config.DB
 	
+	// Setup CORS for integration purposes
+	config.SetupCORS(r)
 
 	// Swagger endpoint
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
