@@ -1,38 +1,30 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"property-backend/controllers"
+
+	"github.com/gin-gonic/gin"
 )
 
 // PropertyRoutes registers property-related routes under /properties
 func PropertyRoutes(rg *gin.RouterGroup, controller *controllers.PropertyController) {
 	props := rg.Group("/properties")
 	{
-
-		// Add property
-		// @Summary Add a new property
+		// Add property basic info (Step 1: Text data only)
+		// @Summary Add property basic information
 		// @Tags Properties
 		// @Accept json
 		// @Produce json
-		// @Router /api/v1/properties [post]
-		props.POST("", controller.AddProperty)
-		
-		// Total properties
-		// @Summary Get total properties count
+		// @Router /api/v1/properties/basic [post]
+		props.POST("/basic", controller.AddPropertyBasicInfo)
+
+		// Upload property files (Step 2: Binary files)
+		// @Summary Upload property files
 		// @Tags Properties
+		// @Accept multipart/form-data
 		// @Produce json
-		// @Router /api/v1/properties/total [get]
-		props.GET("/total", controller.TotalProperties)
-
-		// Active rental properties count
-		// @Summary Get active rental properties count
-		// @Tags Properties
-		// @Produce json
-		// @Router /api/v1/properties/active-rental/count [get]
-		props.GET("/active-rental/count", controller.ActiveRentalPropertyCount)
-
-
+		// @Router /api/v1/properties/:id/files [post]
+		props.POST("/:id/files", controller.UploadPropertyFiles)
 
 		// Agricultural properties
 		// @Summary List agricultural land properties
@@ -55,6 +47,12 @@ func PropertyRoutes(rg *gin.RouterGroup, controller *controllers.PropertyControl
 		// @Router /api/v1/properties/commercial [get]
 		props.GET("/commercial", controller.CommercialLandProperties)
 
-		
+		// Get all properties
+		// @Summary Get all properties
+		// @Description Retrieve all properties with complete details
+		// @Tags Properties
+		// @Produce json
+		// @Router /api/v1/properties [get]
+		props.GET("", controller.GetAllProperties)
 	}
 }

@@ -114,16 +114,16 @@ type PropertyLandDetails struct {
 	LandDetailsID uint `gorm:"column:land_details_id;primaryKey;autoIncrement" json:"land_details_id"`
 	PropertyID    uint `gorm:"column:property_id;not null;unique" json:"property_id"`
 
-	Rtc       string `gorm:"column:rtc;type:varchar(10)" json:"rtc"`
-	Ec        string `gorm:"column:ec;type:varchar(10)" json:"ec"`
-	SyNo      string `gorm:"column:sy_no;type:varchar(100)" json:"sy_no"`
-	KhataNo   string `gorm:"column:khata_no;type:varchar(100)" json:"khata_no"`
-	MrNo      string `gorm:"column:mr_no;type:varchar(100)" json:"mr_no"`
-	Acre      string `gorm:"column:acre;type:varchar(50)" json:"acre"`
-	Gunte     string `gorm:"column:gunte;type:varchar(50)" json:"gunte"`
-	Karab     string `gorm:"column:karab;type:varchar(50)" json:"karab"`
-	Converted string `gorm:"column:converted;type:varchar(10)" json:"converted"`
-	Purpose   string `gorm:"column:purpose;type:varchar(100)" json:"purpose"`
+	Rtc        string `gorm:"column:rtc;type:varchar(10)" json:"rtc"`
+	Ec         string `gorm:"column:ec;type:varchar(10)" json:"ec"`
+	SyNo       string `gorm:"column:sy_no;type:varchar(100)" json:"sy_no"`
+	KhataNo    string `gorm:"column:khata_no;type:varchar(100)" json:"khata_no"`
+	MrNo       string `gorm:"column:mr_no;type:varchar(100)" json:"mr_no"`
+	Acre       string `gorm:"column:acre;type:varchar(50)" json:"acre"`
+	Gunte      string `gorm:"column:gunte;type:varchar(50)" json:"gunte"`
+	Karab      string `gorm:"column:karab;type:varchar(50)" json:"karab"`
+	Converted  string `gorm:"column:converted;type:varchar(10)" json:"converted"`
+	Purpose    string `gorm:"column:purpose;type:varchar(100)" json:"purpose"`
 	KhuskiTari string `gorm:"column:khuski_tari;type:varchar(50)" json:"khuskitari"`
 
 	Property *Property `gorm:"foreignKey:PropertyID;references:PropertyID;constraint:OnDelete:CASCADE"`
@@ -137,11 +137,11 @@ type PropertyTaxDetails struct {
 	TaxID      uint `gorm:"column:tax_id;primaryKey;autoIncrement" json:"tax_id"`
 	PropertyID uint `gorm:"column:property_id;not null;unique" json:"property_id"`
 
-	TaxPaid      bool    `gorm:"column:tax_paid" json:"tax_paid"`
-	ReceiptNo   string  `gorm:"column:receipt_no;type:varchar(100)" json:"receipt_no"`
-	PrevAmount  float64 `gorm:"column:tax_amount_paid_previous_year" json:"tax_amount_paid_previous_year"`
-	CurrAmount  float64 `gorm:"column:tax_amount_paid_current_year" json:"tax_amount_paid_current_year"`
-	ReceiptLink string  `gorm:"column:receipt_photo_link;type:text" json:"receipt_photo_link"`
+	TaxPaid    bool    `gorm:"column:tax_paid" json:"tax_paid"`
+	ReceiptNo  string  `gorm:"column:receipt_no;type:varchar(100)" json:"receipt_no"`
+	PrevAmount float64 `gorm:"column:tax_amount_paid_previous_year" json:"tax_amount_paid_previous_year"`
+	CurrAmount float64 `gorm:"column:tax_amount_paid_current_year" json:"tax_amount_paid_current_year"`
+	ReceiptURL string  `gorm:"column:receipt_url;type:text" json:"receipt_url"`
 
 	Property *Property `gorm:"foreignKey:PropertyID;references:PropertyID;constraint:OnDelete:CASCADE"`
 }
@@ -188,9 +188,9 @@ type PropertyMedia struct {
 	MediaID    uint `gorm:"column:media_id;primaryKey;autoIncrement" json:"media_id"`
 	PropertyID uint `gorm:"column:property_id;not null;unique" json:"property_id"`
 
-	ScannedDeedLink string `gorm:"column:scanned_deed_link;type:text" json:"scanned_deed_link"`
-	PhotoLink       string `gorm:"column:photo_link;type:text" json:"photo_link"`
-	Remarks         string `gorm:"column:remarks;type:text" json:"remarks"`
+	ScannedDeedURL string `gorm:"column:scanned_deed_url;type:text" json:"scanned_deed_url"`
+	PhotoLink      string `gorm:"column:photo_link;type:text" json:"photo_link"`
+	Remarks        string `gorm:"column:remarks;type:text" json:"remarks"`
 
 	Property *Property `gorm:"foreignKey:PropertyID;references:PropertyID;constraint:OnDelete:CASCADE"`
 }

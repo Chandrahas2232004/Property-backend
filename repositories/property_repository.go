@@ -3,18 +3,23 @@ package repositories
 import (
 	"context"
 	"fmt"
+	"mime/multipart"
 	"strconv"
 	"time"
 
-	"gorm.io/gorm"
+	"property-backend/config"
 	"property-backend/models"
+
+	"gorm.io/gorm"
 )
 
 // PropertyRepository defines property-related data access methods
 type PropertyRepository interface {
 	Total(ctx context.Context) (int64, error)
 	ActiveRentalCount(ctx context.Context) (int64, error)
-	Create(ctx context.Context, req interface{}) (int64, error)
+	CreateBasicInfo(ctx context.Context, req interface{}) (int64, error)
+	UploadFiles(ctx context.Context, filesData interface{}) (map[string]string, error)
+	ListAll(ctx context.Context) ([]models.Property, error)
 	ListByType(ctx context.Context, propertyType string) ([]models.Property, error)
 }
 
@@ -47,7 +52,7 @@ func (r *propertyRepository) ActiveRentalCount(ctx context.Context) (int64, erro
 	return count, nil
 }
 
-func (r *propertyRepository) Create(ctx context.Context, req interface{}) (int64, error) {
+func (r *propertyRepository) CreateBasicInfo(ctx context.Context, req interface{}) (int64, error) {
 	// Type assert to get the request object
 	requestData := req.(map[string]interface{})
 
@@ -207,13 +212,12 @@ func (r *propertyRepository) Create(ctx context.Context, req interface{}) (int64
 		return 0, fmt.Errorf("failed to create land details: %w", err)
 	}
 
-	// 5. Create PropertyTaxDetails
+	// 5. Create PropertyTaxDetails (without binary data)
 	taxDetails := models.PropertyTaxDetails{
-		PropertyID:  property.PropertyID,
-		ReceiptNo:   getStringValue(requestData, "receipt_no"),
-		PrevAmount:  getFloatValue(requestData, "prev_amount"),
-		CurrAmount:  getFloatValue(requestData, "curr_amount"),
-		ReceiptLink: getStringValue(requestData, "receipt_link"),
+		PropertyID: property.PropertyID,
+		ReceiptNo:  getStringValue(requestData, "receipt_no"),
+		PrevAmount: getFloatValue(requestData, "prev_amount"),
+		CurrAmount: getFloatValue(requestData, "curr_amount"),
 	}
 	if err := tx.Create(&taxDetails).Error; err != nil {
 		tx.Rollback()
@@ -248,12 +252,11 @@ func (r *propertyRepository) Create(ctx context.Context, req interface{}) (int64
 		return 0, fmt.Errorf("failed to create building details: %w", err)
 	}
 
-	// 8. Create PropertyMedia
+	// 8. Create PropertyMedia (without binary data)
 	media := models.PropertyMedia{
-		PropertyID:      property.PropertyID,
-		ScannedDeedLink: getStringValue(requestData, "scanned_deed_link"),
-		PhotoLink:       getStringValue(requestData, "photo_link"),
-		Remarks:         getStringValue(requestData, "remarks"),
+		PropertyID: property.PropertyID,
+		PhotoLink:  getStringValue(requestData, "photo_link"),
+		Remarks:    getStringValue(requestData, "remarks"),
 	}
 	if err := tx.Create(&media).Error; err != nil {
 		tx.Rollback()
@@ -266,6 +269,104 @@ func (r *propertyRepository) Create(ctx context.Context, req interface{}) (int64
 	}
 
 	return int64(property.PropertyID), nil
+}
+
+func (r *propertyRepository) UploadFiles(ctx context.Context, filesData interface{}) (map[string]string, error) {
+	data := filesData.(map[string]interface{})
+
+	propertyID := data["property_id"].(uint)
+	uploadedFiles := make(map[string]string)
+
+	tx := r.db.WithContext(ctx).Begin()
+
+	// Verify property exists
+	var property models.Property
+	if err := tx.First(&property, propertyID).Error; err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("property not found: %w", err)
+	}
+
+	// Upload ScannedDeed to S3
+	if scannedDeedFile, ok := data["scanned_deed_file"]; ok && scannedDeedFile != nil {
+		scannedDeedHeader := data["scanned_deed_header"]
+
+		// Upload to S3
+		s3URL, err := uploadFileToS3(scannedDeedFile, scannedDeedHeader, "property-deeds")
+		if err != nil {
+			tx.Rollback()
+			return nil, fmt.Errorf("failed to upload scanned deed to S3: %w", err)
+		}
+
+		// Update PropertyMedia
+		var media models.PropertyMedia
+		if err := tx.Where("property_id = ?", propertyID).First(&media).Error; err != nil {
+			tx.Rollback()
+			return nil, fmt.Errorf("property media not found: %w", err)
+		}
+
+		media.ScannedDeedURL = s3URL
+
+		if err := tx.Save(&media).Error; err != nil {
+			tx.Rollback()
+			return nil, fmt.Errorf("failed to update scanned deed URL: %w", err)
+		}
+
+		uploadedFiles["scanned_deed_url"] = s3URL
+	}
+
+	// Upload Receipt to S3
+	if receiptFile, ok := data["receipt_file"]; ok && receiptFile != nil {
+		receiptHeader := data["receipt_header"]
+
+		// Upload to S3
+		s3URL, err := uploadFileToS3(receiptFile, receiptHeader, "property-receipts")
+		if err != nil {
+			tx.Rollback()
+			return nil, fmt.Errorf("failed to upload receipt to S3: %w", err)
+		}
+
+		// Update PropertyTaxDetails
+		var taxDetails models.PropertyTaxDetails
+		if err := tx.Where("property_id = ?", propertyID).First(&taxDetails).Error; err != nil {
+			tx.Rollback()
+			return nil, fmt.Errorf("property tax details not found: %w", err)
+		}
+
+		taxDetails.ReceiptURL = s3URL
+
+		if err := tx.Save(&taxDetails).Error; err != nil {
+			tx.Rollback()
+			return nil, fmt.Errorf("failed to update receipt URL: %w", err)
+		}
+
+		uploadedFiles["receipt_url"] = s3URL
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return uploadedFiles, nil
+}
+
+func (r *propertyRepository) ListAll(ctx context.Context) ([]models.Property, error) {
+	var props []models.Property
+	if err := r.db.WithContext(ctx).
+		Preload("Address").
+		Preload("Address.Taluk").
+		Preload("Address.Taluk.District").
+		Preload("Address.Taluk.District.State").
+		Preload("Address.Taluk.District.State.Country").
+		Preload("PropertyType").
+		Preload("LandDetails").
+		Preload("TaxDetails").
+		Preload("Ownership").
+		Preload("BuildingDetails").
+		Preload("Media").
+		Find(&props).Error; err != nil {
+		return nil, err
+	}
+	return props, nil
 }
 
 func (r *propertyRepository) ListByType(ctx context.Context, propertyType string) ([]models.Property, error) {
@@ -303,4 +404,28 @@ func getFloatValue(data map[string]interface{}, key string) float64 {
 		}
 	}
 	return 0
+}
+
+// uploadFileToS3 uploads a file to AWS S3 and returns the URL
+func uploadFileToS3(file interface{}, header interface{}, folder string) (string, error) {
+	if config.S3Uploader == nil {
+		return "", fmt.Errorf("S3 uploader not initialized")
+	}
+
+	multipartFile, ok := file.(multipart.File)
+	if !ok {
+		return "", fmt.Errorf("invalid file type")
+	}
+
+	multipartHeader, ok := header.(*multipart.FileHeader)
+	if !ok {
+		return "", fmt.Errorf("invalid file header type")
+	}
+
+	url, err := config.S3Uploader.UploadFile(multipartFile, multipartHeader, folder)
+	if err != nil {
+		return "", err
+	}
+
+	return url, nil
 }

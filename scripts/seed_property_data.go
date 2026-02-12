@@ -170,11 +170,11 @@ func SeedSamplePropertyData(db *gorm.DB) {
 				KhuskiTari: "dry",
 			},
 			taxDetails: models.PropertyTaxDetails{
-				TaxPaid:     true,
-				ReceiptNo:   "TAX2024001",
-				PrevAmount:  5000.00,
-				CurrAmount:  5500.00,
-				ReceiptLink: "https://example.com/receipt1.pdf",
+				TaxPaid:    true,
+				ReceiptNo:  "TAX2024001",
+				PrevAmount: 5000.00,
+				CurrAmount: 5500.00,
+				ReceiptURL: "https://example.com/receipt1.pdf",
 			},
 			ownership: models.PropertyOwnershipDetails{
 				ReceivedFrom:        "John Doe",
@@ -191,9 +191,9 @@ func SeedSamplePropertyData(db *gorm.DB) {
 				ApplicationNo:      "APP2015001",
 			},
 			media: models.PropertyMedia{
-				ScannedDeedLink: "https://example.com/deed1.pdf",
-				PhotoLink:       "https://example.com/photo1.jpg",
-				Remarks:         "Property in excellent condition",
+				ScannedDeedURL: "https://example.com/deed1.pdf",
+				PhotoLink:      "https://example.com/photo1.jpg",
+				Remarks:        "Property in excellent condition",
 			},
 		},
 		{
@@ -228,11 +228,11 @@ func SeedSamplePropertyData(db *gorm.DB) {
 				KhuskiTari: "irrigated",
 			},
 			taxDetails: models.PropertyTaxDetails{
-				TaxPaid:     true,
-				ReceiptNo:   "TAX2024002",
-				PrevAmount:  8000.00,
-				CurrAmount:  8500.00,
-				ReceiptLink: "https://example.com/receipt2.pdf",
+				TaxPaid:    true,
+				ReceiptNo:  "TAX2024002",
+				PrevAmount: 8000.00,
+				CurrAmount: 8500.00,
+				ReceiptURL: "https://example.com/receipt2.pdf",
 			},
 			ownership: models.PropertyOwnershipDetails{
 				ReceivedFrom:        "ABC Corporation",
@@ -249,9 +249,9 @@ func SeedSamplePropertyData(db *gorm.DB) {
 				ApplicationNo:      "APP2018025",
 			},
 			media: models.PropertyMedia{
-				ScannedDeedLink: "https://example.com/deed2.pdf",
-				PhotoLink:       "https://example.com/photo2.jpg",
-				Remarks:         "Prime location for business",
+				ScannedDeedURL: "https://example.com/deed2.pdf",
+				PhotoLink:      "https://example.com/photo2.jpg",
+				Remarks:        "Prime location for business",
 			},
 		},
 		{
@@ -286,11 +286,11 @@ func SeedSamplePropertyData(db *gorm.DB) {
 				KhuskiTari: "irrigated",
 			},
 			taxDetails: models.PropertyTaxDetails{
-				TaxPaid:     true,
-				ReceiptNo:   "TAX2024003",
-				PrevAmount:  3000.00,
-				CurrAmount:  3200.00,
-				ReceiptLink: "https://example.com/receipt3.pdf",
+				TaxPaid:    true,
+				ReceiptNo:  "TAX2024003",
+				PrevAmount: 3000.00,
+				CurrAmount: 3200.00,
+				ReceiptURL: "https://example.com/receipt3.pdf",
 			},
 			ownership: models.PropertyOwnershipDetails{
 				ReceivedFrom:        "Ancestral Property",
@@ -307,9 +307,9 @@ func SeedSamplePropertyData(db *gorm.DB) {
 				ApplicationNo:      "APP2010010",
 			},
 			media: models.PropertyMedia{
-				ScannedDeedLink: "https://example.com/deed3.pdf",
-				PhotoLink:       "https://example.com/photo3.jpg",
-				Remarks:         "Fertile land with water source",
+				ScannedDeedURL: "https://example.com/deed3.pdf",
+				PhotoLink:      "https://example.com/photo3.jpg",
+				Remarks:        "Fertile land with water source",
 			},
 		},
 	}

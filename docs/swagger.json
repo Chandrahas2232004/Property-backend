@@ -237,6 +237,86 @@
                 }
             }
         },
+        "/api/v1/dashboard/active-rental-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get total active rental count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dashboard/total-amc-contracts": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get total AMC contract count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dashboard/total-assets": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get total asset count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dashboard/total-properties": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get total property count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/form/country": {
             "get": {
                 "produces": [
@@ -345,40 +425,27 @@
             }
         },
         "/api/v1/properties": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Properties"
-                ],
-                "summary": "Add a new property with all details",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/properties/active-rental/count": {
             "get": {
+                "description": "Retrieve all properties with complete details including address, land details, tax details, media, and ownership information",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Properties"
                 ],
-                "summary": "Get active rental properties count",
+                "summary": "Get all properties",
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Property"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -404,6 +471,30 @@
                             "items": {
                                 "$ref": "#/definitions/models.Property"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/properties/basic": {
+            "post": {
+                "description": "Creates property with all text fields. Use UploadPropertyFiles endpoint to upload binary files after.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Properties"
+                ],
+                "summary": "Add a new property with text information only (Step 1)",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -453,15 +544,40 @@
                 }
             }
         },
-        "/api/v1/properties/total": {
-            "get": {
+        "/api/v1/properties/{id}/files": {
+            "post": {
+                "description": "Upload ScannedDeed and Receipt files to S3 for an existing property",
+                "consumes": [
+                    "multipart/form-data"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Properties"
                 ],
-                "summary": "Get total properties count",
+                "summary": "Upload binary files for a property (Step 2)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Property ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Scanned Deed PDF/Image",
+                        "name": "scanned_deed",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Tax Receipt PDF/Image",
+                        "name": "receipt",
+                        "in": "formData"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -837,7 +953,7 @@
                 "remarks": {
                     "type": "string"
                 },
-                "scanned_deed_link": {
+                "scanned_deed_url": {
                     "type": "string"
                 }
             }
@@ -886,7 +1002,7 @@
                 "receipt_no": {
                     "type": "string"
                 },
-                "receipt_photo_link": {
+                "receipt_url": {
                     "type": "string"
                 },
                 "tax_amount_paid_current_year": {

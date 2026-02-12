@@ -9,9 +9,9 @@ import (
 
 // PropertyService defines property domain logic
 type PropertyService interface {
-	Total(ctx context.Context) (int64, error)
-	ActiveRentalCount(ctx context.Context) (int64, error)
-	AddProperty(ctx context.Context, req interface{}) (int64, error)
+	AddPropertyBasicInfo(ctx context.Context, req interface{}) (int64, error)
+	UploadPropertyFiles(ctx context.Context, filesData interface{}) (map[string]string, error)
+	GetAll(ctx context.Context) ([]models.Property, error)
 	ListByType(ctx context.Context, propertyType string) ([]models.Property, error)
 }
 
@@ -24,16 +24,16 @@ func NewPropertyService(repo repositories.PropertyRepository) PropertyService {
 	return &propertyService{repo: repo}
 }
 
-func (s *propertyService) Total(ctx context.Context) (int64, error) {
-	return s.repo.Total(ctx)
+func (s *propertyService) AddPropertyBasicInfo(ctx context.Context, req interface{}) (int64, error) {
+	return s.repo.CreateBasicInfo(ctx, req)
 }
 
-func (s *propertyService) ActiveRentalCount(ctx context.Context) (int64, error) {
-	return s.repo.ActiveRentalCount(ctx)
+func (s *propertyService) UploadPropertyFiles(ctx context.Context, filesData interface{}) (map[string]string, error) {
+	return s.repo.UploadFiles(ctx, filesData)
 }
 
-func (s *propertyService) AddProperty(ctx context.Context, req interface{}) (int64, error) {
-	return s.repo.Create(ctx, req)
+func (s *propertyService) GetAll(ctx context.Context) ([]models.Property, error) {
+	return s.repo.ListAll(ctx)
 }
 
 func (s *propertyService) ListByType(ctx context.Context, propertyType string) ([]models.Property, error) {

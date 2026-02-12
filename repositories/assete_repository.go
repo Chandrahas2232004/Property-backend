@@ -3,14 +3,16 @@ package repositories
 import (
 	"context"
 
-	"gorm.io/gorm"
 	"property-backend/models"
+
+	"gorm.io/gorm"
 )
 
 // AssetRepository defines asset-related data access methods
 type AssetRepository interface {
 	Create(ctx context.Context, a *models.Asset) (int64, error)
 	ListAll(ctx context.Context) ([]models.Asset, error)
+	CountAll(ctx context.Context) (int64, error)
 }
 
 type assetRepository struct {
@@ -35,4 +37,12 @@ func (r *assetRepository) ListAll(ctx context.Context) ([]models.Asset, error) {
 		return nil, err
 	}
 	return assets, nil
+}
+
+func (r *assetRepository) CountAll(ctx context.Context) (int64, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).Model(&models.Asset{}).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }

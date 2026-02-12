@@ -3,8 +3,9 @@ package repositories
 import (
 	"context"
 
-	"gorm.io/gorm"
 	"property-backend/models"
+
+	"gorm.io/gorm"
 )
 
 // ContractRepository defines contract-related data access methods
@@ -12,6 +13,7 @@ type ContractRepository interface {
 	Create(ctx context.Context, c *models.Contract) (int64, error)
 	ListAll(ctx context.Context) ([]models.Contract, error)
 	ListByType(ctx context.Context, contractType string) ([]models.Contract, error)
+	CountByType(ctx context.Context, contractType string) (int64, error)
 }
 
 type contractRepository struct {
@@ -49,4 +51,16 @@ func (r *contractRepository) ListByType(ctx context.Context, contractType string
 		return nil, err
 	}
 	return contracts, nil
+}
+
+func (r *contractRepository) CountByType(ctx context.Context, contractType string) (int64, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).
+		Model(&models.Contract{}).
+		Joins("LEFT JOIN contract_type_master ON contract_type_master.contract_type_id = contracts.contract_type_id").
+		Where("contract_type_master.contract_type_name = ?", contractType).
+		Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }

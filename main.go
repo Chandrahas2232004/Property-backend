@@ -1,9 +1,7 @@
 package main
 
 import (
-	
 	"log"
-	
 
 	"github.com/gin-gonic/gin"
 
@@ -19,19 +17,22 @@ import (
 )
 
 func main() {
-	
 
 	/// ✅ INIT FILE LOGGING FIRST
 	config.InitFileLogger()
 
 	log.Println("🚀 Application starting...")
-	// connect database
+
+	// Connect database
 	config.ConnectDatabase()
+
+	// Initialize S3 uploader
+	config.InitS3()
 
 	// setup gin
 	r := gin.Default()
-    db := config.DB
-	
+	db := config.DB
+
 	// Setup CORS for integration purposes
 	config.SetupCORS(r)
 
@@ -56,6 +57,7 @@ func main() {
 	assetSvc := services.NewAssetService(assetRepo)
 	contractSvc := services.NewContractService(contractRepo)
 	formSvc := services.NewFormService(formRepo)
+	dashboardSvc := services.NewDashboardService(propertyRepo, assetRepo, contractRepo)
 
 	// Instantiate controllers with services
 	authController := controllers.NewAuthController(authSvc)
@@ -64,6 +66,7 @@ func main() {
 	assetController := controllers.NewAssetController(assetSvc)
 	contractController := controllers.NewContractController(contractSvc)
 	formController := controllers.NewFormController(formSvc)
+	dashboardController := controllers.NewDashboardController(dashboardSvc)
 
 	// Register routes under /api/v1
 	routes.RegisterRoutes(
@@ -74,9 +77,9 @@ func main() {
 		assetController,
 		contractController,
 		formController,
+		dashboardController,
 	)
 
-	
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": "ok",

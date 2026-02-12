@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"property-backend/controllers"
+
+	"github.com/gin-gonic/gin"
 )
 
 // RegisterRoutes registers all API routes under a provided RouterGroup
@@ -13,6 +14,7 @@ func RegisterRoutes(api *gin.RouterGroup,
 	assetController *controllers.AssetController,
 	contractController *controllers.ContractController,
 	formController *controllers.FormController,
+	dashboardController *controllers.DashboardController,
 ) {
 	// domain-specific routes
 	AuthRoutes(api, authController)
@@ -21,4 +23,5 @@ func RegisterRoutes(api *gin.RouterGroup,
 	AssetRoutes(api, assetController)
 	ContractRoutes(api, contractController)
 	FormRoutes(api, formController)
+	DashboardRoutes(api, dashboardController)
 }
