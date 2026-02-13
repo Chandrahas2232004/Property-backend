@@ -17,6 +17,7 @@ import (
 type PropertyRepository interface {
 	Total(ctx context.Context) (int64, error)
 	ActiveRentalCount(ctx context.Context) (int64, error)
+	RecentByUser(ctx context.Context, userID uint, limit int) ([]models.ActivityItem, error)
 	CreateBasicInfo(ctx context.Context, req interface{}) (int64, error)
 	UploadFiles(ctx context.Context, filesData interface{}) (map[string]string, error)
 	ListAll(ctx context.Context) ([]models.Property, error)
@@ -50,6 +51,20 @@ func (r *propertyRepository) ActiveRentalCount(ctx context.Context) (int64, erro
 		return 0, err
 	}
 	return count, nil
+}
+
+func (r *propertyRepository) RecentByUser(ctx context.Context, userID uint, limit int) ([]models.ActivityItem, error) {
+	var items []models.ActivityItem
+	if err := r.db.WithContext(ctx).
+		Table("property").
+		Select("property_id as respective_id, created_at as time_created, ? as type", "property").
+		Where("user_id = ?", userID).
+		Order("created_at desc").
+		Limit(limit).
+		Scan(&items).Error; err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 func (r *propertyRepository) CreateBasicInfo(ctx context.Context, req interface{}) (int64, error) {

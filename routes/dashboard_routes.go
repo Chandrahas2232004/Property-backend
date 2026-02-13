@@ -37,5 +37,12 @@ func DashboardRoutes(rg *gin.RouterGroup, controller *controllers.DashboardContr
 		// @Produce json
 		// @Router /api/v1/dashboard/active-rental-count [get]
 		dashboard.GET("/active-rental-count", controller.GetTotalActiveRentalCount)
+
+		// Recent activities
+		// @Summary Get recent activities
+		// @Tags Dashboard
+		// @Produce json
+		// @Router /api/v1/dashboard/recent-activities [get]
+		dashboard.GET("/recent-activities", controller.GetRecentActivities)
 	}
 }

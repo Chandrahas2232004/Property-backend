@@ -3,14 +3,16 @@ package repositories
 import (
 	"context"
 
-	"gorm.io/gorm"
 	"property-backend/models"
+
+	"gorm.io/gorm"
 )
 
 // AgreementRepository defines agreement-related data access methods
 type AgreementRepository interface {
 	CreateRental(ctx context.Context, a *models.Agreement) (int64, error)
 	ListAll(ctx context.Context) ([]models.Agreement, error)
+	RecentByUser(ctx context.Context, userID uint, limit int) ([]models.ActivityItem, error)
 }
 
 type agreementRepository struct {
@@ -35,4 +37,19 @@ func (r *agreementRepository) ListAll(ctx context.Context) ([]models.Agreement, 
 		return nil, err
 	}
 	return agreements, nil
+}
+
+func (r *agreementRepository) RecentByUser(ctx context.Context, userID uint, limit int) ([]models.ActivityItem, error) {
+	var items []models.ActivityItem
+	if err := r.db.WithContext(ctx).
+		Table("agreement").
+		Select("agreement.agreement_id as respective_id, agreement.created_at as time_created, ? as type", "agreement").
+		Joins("JOIN property ON property.property_id = agreement.property_id").
+		Where("property.user_id = ?", userID).
+		Order("agreement.created_at desc").
+		Limit(limit).
+		Scan(&items).Error; err != nil {
+		return nil, err
+	}
+	return items, nil
 }

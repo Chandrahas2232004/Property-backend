@@ -14,6 +14,7 @@ type ContractRepository interface {
 	ListAll(ctx context.Context) ([]models.Contract, error)
 	ListByType(ctx context.Context, contractType string) ([]models.Contract, error)
 	CountByType(ctx context.Context, contractType string) (int64, error)
+	RecentByUser(ctx context.Context, userID uint, limit int) ([]models.ActivityItem, error)
 }
 
 type contractRepository struct {
@@ -63,4 +64,20 @@ func (r *contractRepository) CountByType(ctx context.Context, contractType strin
 		return 0, err
 	}
 	return count, nil
+}
+
+func (r *contractRepository) RecentByUser(ctx context.Context, userID uint, limit int) ([]models.ActivityItem, error) {
+	var items []models.ActivityItem
+	if err := r.db.WithContext(ctx).
+		Table("contracts").
+		Select("contracts.contract_id as respective_id, contracts.created_at as time_created, ? as type", "contract").
+		Joins("JOIN assets ON assets.asset_id = contracts.asset_id").
+		Joins("JOIN property ON property.property_id = assets.property_id").
+		Where("property.user_id = ?", userID).
+		Order("contracts.created_at desc").
+		Limit(limit).
+		Scan(&items).Error; err != nil {
+		return nil, err
+	}
+	return items, nil
 }

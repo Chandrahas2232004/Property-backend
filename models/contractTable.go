@@ -33,6 +33,7 @@ type Contract struct {
 
 	StartDate time.Time `gorm:"column:start_date" json:"start_date"`
 	EndDate   time.Time `gorm:"column:end_date" json:"end_date"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime" json:"created_at"`
 
 	Terms string `gorm:"column:terms;type:text" json:"terms"`
 

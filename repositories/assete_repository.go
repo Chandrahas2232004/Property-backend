@@ -13,6 +13,7 @@ type AssetRepository interface {
 	Create(ctx context.Context, a *models.Asset) (int64, error)
 	ListAll(ctx context.Context) ([]models.Asset, error)
 	CountAll(ctx context.Context) (int64, error)
+	RecentByUser(ctx context.Context, userID uint, limit int) ([]models.ActivityItem, error)
 }
 
 type assetRepository struct {
@@ -45,4 +46,19 @@ func (r *assetRepository) CountAll(ctx context.Context) (int64, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+func (r *assetRepository) RecentByUser(ctx context.Context, userID uint, limit int) ([]models.ActivityItem, error) {
+	var items []models.ActivityItem
+	if err := r.db.WithContext(ctx).
+		Table("assets").
+		Select("assets.asset_id as respective_id, assets.created_at as time_created, ? as type", "asset").
+		Joins("JOIN property ON property.property_id = assets.property_id").
+		Where("property.user_id = ?", userID).
+		Order("assets.created_at desc").
+		Limit(limit).
+		Scan(&items).Error; err != nil {
+		return nil, err
+	}
+	return items, nil
 }
