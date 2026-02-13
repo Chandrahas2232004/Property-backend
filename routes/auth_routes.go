@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"property-backend/controllers"
+
+	"github.com/gin-gonic/gin"
 )
 
 // AuthRoutes registers authentication routes under /auth
@@ -24,5 +25,21 @@ func AuthRoutes(rg *gin.RouterGroup, controller *controllers.AuthController) {
 		// @Produce json
 		// @Router /api/v1/auth/signin [post]
 		auth.POST("/signin", controller.SignIn)
+
+		// ForgotPassword
+		// @Summary Request a password reset
+		// @Tags Auth
+		// @Accept json
+		// @Produce json
+		// @Router /api/v1/auth/forgot-password [post]
+		auth.POST("/forgot-password", controller.ForgotPassword)
+
+		// ResetPassword
+		// @Summary Reset password with token
+		// @Tags Auth
+		// @Accept json
+		// @Produce json
+		// @Router /api/v1/auth/reset-password [post]
+		auth.POST("/reset-password", controller.ResetPassword)
 	}
 }

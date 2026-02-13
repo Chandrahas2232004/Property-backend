@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
@@ -22,6 +23,17 @@ func main() {
 	config.InitFileLogger()
 
 	log.Println("🚀 Application starting...")
+
+	// Initialize JWT (check if secret is configured)
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Println("⚠️  JWT_SECRET not set - authentication tokens will fail")
+	} else {
+		log.Println("✅ JWT_SECRET configured")
+	}
+
+	// Initialize SendGrid for email functionality
+	config.InitSendGrid()
 
 	// Connect database
 	config.ConnectDatabase()

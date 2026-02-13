@@ -2,6 +2,7 @@ package routes
 
 import (
 	"property-backend/controllers"
+	"property-backend/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,12 +17,18 @@ func RegisterRoutes(api *gin.RouterGroup,
 	formController *controllers.FormController,
 	dashboardController *controllers.DashboardController,
 ) {
-	// domain-specific routes
+	// Public routes (no auth required)
 	AuthRoutes(api, authController)
-	PropertyRoutes(api, propertyController)
-	AgreementRoutes(api, agreementController)
-	AssetRoutes(api, assetController)
-	ContractRoutes(api, contractController)
-	FormRoutes(api, formController)
-	DashboardRoutes(api, dashboardController)
+
+	// Protected routes (auth required)
+	protectedAPI := api.Group("")
+	protectedAPI.Use(middleware.AuthMiddleware())
+	{
+		PropertyRoutes(protectedAPI, propertyController)
+		AgreementRoutes(protectedAPI, agreementController)
+		AssetRoutes(protectedAPI, assetController)
+		ContractRoutes(protectedAPI, contractController)
+		FormRoutes(protectedAPI, formController)
+		DashboardRoutes(protectedAPI, dashboardController)
+	}
 }

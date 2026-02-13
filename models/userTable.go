@@ -11,14 +11,16 @@ import (
 ========================= */
 
 type User struct {
-	UserID         uint      `gorm:"column:user_id;primaryKey;autoIncrement" json:"user_id"`
-	FirstName      string    `gorm:"column:first_name;type:varchar(100);not null" json:"first_name"`
-	LastName       string    `gorm:"column:last_name;type:varchar(100);not null" json:"last_name"`
-	Email          string    `gorm:"column:email;type:varchar(150);unique;not null" json:"email"`
-	HashedPassword string    `gorm:"column:hashed_password;type:varchar(255);not null" json:"hashed_password"`
-	PhoneNumber    string    `gorm:"column:phone_number;type:varchar(15)" json:"phone_number"`
-	RoleID         uint      `gorm:"column:role_id;not null" json:"role_id"`
-	CreatedAt      time.Time `gorm:"column:created_at;autoCreateTime" json:"created_at"`
+	UserID              uint       `gorm:"column:user_id;primaryKey;autoIncrement" json:"user_id"`
+	FirstName           string     `gorm:"column:first_name;type:varchar(100);not null" json:"first_name"`
+	LastName            string     `gorm:"column:last_name;type:varchar(100);not null" json:"last_name"`
+	Email               string     `gorm:"column:email;type:varchar(150);unique;not null" json:"email"`
+	HashedPassword      string     `gorm:"column:hashed_password;type:varchar(255);not null" json:"hashed_password"`
+	PhoneNumber         string     `gorm:"column:phone_number;type:varchar(15)" json:"phone_number"`
+	RoleID              uint       `gorm:"column:role_id;not null" json:"role_id"`
+	PasswordResetToken  *string    `gorm:"column:password_reset_token;type:varchar(500)" json:"password_reset_token"`
+	PasswordResetExpiry *time.Time `gorm:"column:password_reset_expiry" json:"password_reset_expiry"`
+	CreatedAt           time.Time  `gorm:"column:created_at;autoCreateTime" json:"created_at"`
 
 	Role RolesMaster `gorm:"foreignKey:RoleID;references:RolesMasterID" json:"role"`
 }

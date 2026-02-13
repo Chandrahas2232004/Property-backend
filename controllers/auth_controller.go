@@ -4,10 +4,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"property-backend/models"
 	"property-backend/services"
 	"property-backend/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 // AuthController handles authentication endpoints
@@ -55,12 +56,12 @@ func (a *AuthController) SignUp(c *gin.Context) {
 		PhoneNumber:    req.PhoneNumber,
 		RoleID:         req.RoleID,
 	}
-	id, err := a.svc.SignUp(context.Background(), &user)
+	authResp, err := a.svc.SignUp(context.Background(), &user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, authResp)
 }
 
 // SignIn godoc
@@ -80,7 +81,7 @@ func (a *AuthController) SignIn(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	user, err := a.svc.SignIn(context.Background(), req.Email, req.Password)
+	authResp, err := a.svc.SignIn(context.Background(), req.Email, req.Password)
 	if err != nil {
 		// treat invalid credentials distinctly
 		if err == services.ErrInvalidCredentials {
@@ -90,5 +91,58 @@ func (a *AuthController) SignIn(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, authResp)
+}
+
+// ForgotPassword godoc
+// @Summary Request a password reset
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Router /api/v1/auth/forgot-password [post]
+func (a *AuthController) ForgotPassword(c *gin.Context) {
+	var req struct {
+		Email string `json:"email" binding:"required,email"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := a.svc.ForgotPassword(context.Background(), req.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password reset link sent to your email"})
+}
+
+// ResetPassword godoc
+// @Summary Reset password with token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Router /api/v1/auth/reset-password [post]
+func (a *AuthController) ResetPassword(c *gin.Context) {
+	var req struct {
+		Token       string `json:"token" binding:"required"`
+		NewPassword string `json:"new_password" binding:"required,min=8"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := a.svc.ResetPassword(context.Background(), req.Token, req.NewPassword)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password reset successfully"})
 }

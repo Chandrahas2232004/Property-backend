@@ -3,3 +3,5 @@ app.exe
 *.log
 example.txt
 property-backend.exe
+FORGET_PASSWORD_SETUP.md
+JWT_AUTH_SETUP.md
