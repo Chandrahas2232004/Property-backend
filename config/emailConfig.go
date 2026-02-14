@@ -3,47 +3,60 @@ package config
 import (
 	"fmt"
 	"log"
+	"net/smtp"
 	"os"
-
-	"github.com/sendgrid/sendgrid-go"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-var SendGridClient *sendgrid.Client
+// EmailConfig holds Gmail SMTP configuration
+type EmailConfig struct {
+	SMTPServer   string
+	SMTPPort     string
+	SMTPUsername string
+	SMTPPassword string
+	FromEmail    string
+}
 
-// InitSendGrid initializes the Twilio SendGrid client
-func InitSendGrid() {
-	apiKey := os.Getenv("SENDGRID_API_KEY")
-	if apiKey == "" {
-		log.Println("⚠️  SENDGRID_API_KEY not set - email functionality will be disabled")
+var GmailConfig *EmailConfig
+
+// InitGmail initializes the Gmail SMTP configuration
+func InitGmail() {
+	smtpUsername := os.Getenv("GMAIL_USERNAME")
+	smtpPassword := os.Getenv("GMAIL_PASSWORD")
+
+	if smtpUsername == "" || smtpPassword == "" {
+		log.Println("⚠️  GMAIL_USERNAME or GMAIL_PASSWORD not set - email functionality will be disabled")
 		return
 	}
 
-	SendGridClient = sendgrid.NewSendClient(apiKey)
-	log.Println("✅ SendGrid initialized successfully")
+	GmailConfig = &EmailConfig{
+		SMTPServer:   "smtp.gmail.com",
+		SMTPPort:     "587",
+		SMTPUsername: smtpUsername,
+		SMTPPassword: smtpPassword,
+		FromEmail:    smtpUsername,
+	}
+	log.Println("✅ Gmail SMTP initialized successfully")
 }
 
-// SendEmail sends an email using Twilio SendGrid
+// SendEmail sends an email using Gmail SMTP
 func SendEmail(fromEmail, toEmail, subject, htmlContent string) error {
-	if SendGridClient == nil {
-		return fmt.Errorf("SendGrid client not initialized")
+	if GmailConfig == nil {
+		return fmt.Errorf("Gmail configuration not initialized")
 	}
 
-	from := mail.NewEmail("Property Management", fromEmail)
-	to := mail.NewEmail("User", toEmail)
-	message := mail.NewSingleEmail(from, subject, to, subject, htmlContent)
+	auth := smtp.PlainAuth("", GmailConfig.SMTPUsername, GmailConfig.SMTPPassword, GmailConfig.SMTPServer)
+	addr := fmt.Sprintf("%s:%s", GmailConfig.SMTPServer, GmailConfig.SMTPPort)
 
-	response, err := SendGridClient.Send(message)
+	headers := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n",
+		GmailConfig.FromEmail, toEmail, subject)
+	body := headers + htmlContent
+
+	err := smtp.SendMail(addr, auth, GmailConfig.FromEmail, []string{toEmail}, []byte(body))
 	if err != nil {
 		log.Println("Error sending email:", err)
 		return err
 	}
 
-	if response.StatusCode < 200 || response.StatusCode >= 300 {
-		log.Printf("SendGrid error: Status %d, Body: %s\n", response.StatusCode, response.Body)
-		return fmt.Errorf("sendgrid error: status %d", response.StatusCode)
-	}
-
-	log.Printf("✅ Email sent successfully to %s (Status: %d)\n", toEmail, response.StatusCode)
+	log.Printf("✅ Email sent successfully to %s\n", toEmail)
 	return nil
 }

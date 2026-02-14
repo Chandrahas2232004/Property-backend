@@ -32,8 +32,8 @@ func main() {
 		log.Println("✅ JWT_SECRET configured")
 	}
 
-	// Initialize SendGrid for email functionality
-	config.InitSendGrid()
+	// Initialize Gmail SMTP for email functionality
+	config.InitGmail()
 
 	// Connect database
 	config.ConnectDatabase()

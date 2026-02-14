@@ -5,3 +5,7 @@ example.txt
 property-backend.exe
 FORGET_PASSWORD_SETUP.md
 JWT_AUTH_SETUP.md
+scripts/check_user_data.go
+scripts/generate_token.go
+scripts/seed_property_data.go
+scripts/test_recent_activities.go

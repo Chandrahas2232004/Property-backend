@@ -110,7 +110,7 @@ func (s *authService) ForgotPassword(ctx context.Context, email string) error {
 		return fmt.Errorf("failed to save reset token")
 	}
 
-	// Send email via Twilio SendGrid
+	// Send email via Gmail SMTP
 	if err := utils.SendPasswordResetEmail(email, user.FirstName, token); err != nil {
 		return fmt.Errorf("failed to send email: %v", err)
 	}

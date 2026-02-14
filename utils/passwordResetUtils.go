@@ -5,11 +5,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"net/smtp"
 	"os"
 	"time"
-
-	"github.com/sendgrid/sendgrid-go"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
 // GeneratePasswordResetToken generates a secure random token for password reset
@@ -67,17 +65,16 @@ func BuildPasswordResetEmailTemplate(firstName, resetLink string) string {
 	`, firstName, resetLink, resetLink)
 }
 
-// SendPasswordResetEmail sends a password reset email via Twilio SendGrid
+// SendPasswordResetEmail sends a password reset email via Gmail SMTP
 func SendPasswordResetEmail(toEmail, firstName, resetToken string) error {
-	apiKey := os.Getenv("SENDGRID_API_KEY")
-	if apiKey == "" {
-		return fmt.Errorf("SENDGRID_API_KEY not configured")
+	smtpUsername := os.Getenv("GMAIL_USERNAME")
+	smtpPassword := os.Getenv("GMAIL_PASSWORD")
+
+	if smtpUsername == "" || smtpPassword == "" {
+		return fmt.Errorf("GMAIL_USERNAME or GMAIL_PASSWORD not configured")
 	}
 
-	fromEmail := os.Getenv("SENDGRID_FROM_EMAIL")
-	if fromEmail == "" {
-		fromEmail = "noreply@propertymanagement.com"
-	}
+	fromEmail := smtpUsername
 
 	frontendURL := os.Getenv("FRONTEND_URL")
 	if frontendURL == "" {
@@ -87,21 +84,23 @@ func SendPasswordResetEmail(toEmail, firstName, resetToken string) error {
 	resetLink := fmt.Sprintf("%s/reset-password?token=%s", frontendURL, resetToken)
 	emailTemplate := BuildPasswordResetEmailTemplate(firstName, resetLink)
 
-	from := mail.NewEmail("Property Management", fromEmail)
-	to := mail.NewEmail(firstName, toEmail)
-	message := mail.NewSingleEmail(from, "Password Reset Request", to, "Password Reset Request", emailTemplate)
-	message.SetReplyTo(mail.NewEmail("Support", fromEmail))
+	// Gmail SMTP configuration
+	smtpServer := "smtp.gmail.com"
+	smtpPort := "587"
+	auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpServer)
+	addr := fmt.Sprintf("%s:%s", smtpServer, smtpPort)
 
-	client := sendgrid.NewSendClient(apiKey)
-	response, err := client.Send(message)
+	// Build email headers
+	subject := "Password Reset Request"
+	headers := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nReply-To: %s\r\n\r\n",
+		fromEmail, toEmail, subject, fromEmail)
+	body := headers + emailTemplate
+
+	// Send email
+	err := smtp.SendMail(addr, auth, fromEmail, []string{toEmail}, []byte(body))
 	if err != nil {
 		log.Printf("Error sending email: %v\n", err)
 		return err
-	}
-
-	if response.StatusCode < 200 || response.StatusCode >= 300 {
-		log.Printf("SendGrid error: Status %d, Body: %s\n", response.StatusCode, response.Body)
-		return fmt.Errorf("sendgrid error: status %d", response.StatusCode)
 	}
 
 	log.Printf("✅ Password reset email sent successfully to %s\n", toEmail)
