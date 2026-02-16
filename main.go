@@ -61,6 +61,7 @@ func main() {
 	assetRepo := repositories.NewAssetRepository(db)
 	contractRepo := repositories.NewContractRepository(db)
 	formRepo := repositories.NewFormRepository(db)
+	dashboardRepo := repositories.NewDashboardRepository(db)
 
 	// Construct services
 	authSvc := services.NewAuthService(authRepo)
@@ -69,7 +70,7 @@ func main() {
 	assetSvc := services.NewAssetService(assetRepo)
 	contractSvc := services.NewContractService(contractRepo)
 	formSvc := services.NewFormService(formRepo)
-	dashboardSvc := services.NewDashboardService(propertyRepo, assetRepo, contractRepo, agreementRepo)
+	dashboardSvc := services.NewDashboardService(dashboardRepo)
 
 	// Instantiate controllers with services
 	authController := controllers.NewAuthController(authSvc)

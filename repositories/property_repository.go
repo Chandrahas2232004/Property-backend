@@ -21,7 +21,9 @@ type PropertyRepository interface {
 	CreateBasicInfo(ctx context.Context, req interface{}) (int64, error)
 	UploadFiles(ctx context.Context, filesData interface{}) (map[string]string, error)
 	ListAll(ctx context.Context) ([]models.Property, error)
+	ListAllByUser(ctx context.Context, userID uint) ([]models.Property, error)
 	ListByType(ctx context.Context, propertyType string) ([]models.Property, error)
+	ListByTypeByUser(ctx context.Context, propertyType string, userID uint) ([]models.Property, error)
 }
 
 type propertyRepository struct {
@@ -391,6 +393,42 @@ func (r *propertyRepository) ListByType(ctx context.Context, propertyType string
 		Preload("PropertyType").
 		Joins("JOIN property_type_master ON property_type_master.property_type_id = property.property_type_id").
 		Where("property_type_master.property_type_name = ?", propertyType).
+		Find(&props).Error; err != nil {
+		return nil, err
+	}
+	return props, nil
+}
+
+// ListAllByUser returns all properties for a specific user
+func (r *propertyRepository) ListAllByUser(ctx context.Context, userID uint) ([]models.Property, error) {
+	var props []models.Property
+	if err := r.db.WithContext(ctx).
+		Preload("Address").
+		Preload("Address.Taluk").
+		Preload("Address.Taluk.District").
+		Preload("Address.Taluk.District.State").
+		Preload("Address.Taluk.District.State.Country").
+		Preload("PropertyType").
+		Preload("LandDetails").
+		Preload("TaxDetails").
+		Preload("Ownership").
+		Preload("BuildingDetails").
+		Preload("Media").
+		Where("user_id = ?", userID).
+		Find(&props).Error; err != nil {
+		return nil, err
+	}
+	return props, nil
+}
+
+// ListByTypeByUser returns properties of a specific type for a specific user
+func (r *propertyRepository) ListByTypeByUser(ctx context.Context, propertyType string, userID uint) ([]models.Property, error) {
+	var props []models.Property
+	if err := r.db.WithContext(ctx).
+		Preload("Address").
+		Preload("PropertyType").
+		Joins("JOIN property_type_master ON property_type_master.property_type_id = property.property_type_id").
+		Where("property_type_master.property_type_name = ? AND property.user_id = ?", propertyType, userID).
 		Find(&props).Error; err != nil {
 		return nil, err
 	}

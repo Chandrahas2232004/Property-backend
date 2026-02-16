@@ -2,93 +2,54 @@ package services
 
 import (
 	"context"
-	"sort"
 
 	"property-backend/models"
 	"property-backend/repositories"
 )
 
-// DashboardService provides dashboard metrics
-// It aggregates counts from multiple domains.
+// DashboardService provides dashboard metrics specific to a user
+// It aggregates counts from multiple domains for the authenticated user.
 type DashboardService interface {
-	TotalPropertyCount(ctx context.Context) (int64, error)
-	TotalAssetCount(ctx context.Context) (int64, error)
-	TotalAMCContractCount(ctx context.Context) (int64, error)
-	TotalActiveRentalCount(ctx context.Context) (int64, error)
+	TotalPropertyCount(ctx context.Context, userID uint) (int64, error)
+	TotalAssetCount(ctx context.Context, userID uint) (int64, error)
+	TotalAMCContractCount(ctx context.Context, userID uint) (int64, error)
+	TotalActiveRentalCount(ctx context.Context, userID uint) (int64, error)
 	RecentActivities(ctx context.Context, userID uint) ([]models.ActivityItem, error)
 }
 
 type dashboardService struct {
-	propertyRepo  repositories.PropertyRepository
-	assetRepo     repositories.AssetRepository
-	contractRepo  repositories.ContractRepository
-	agreementRepo repositories.AgreementRepository
+	dashboardRepo repositories.DashboardRepository
 }
 
 // NewDashboardService constructs a DashboardService
-func NewDashboardService(
-	propertyRepo repositories.PropertyRepository,
-	assetRepo repositories.AssetRepository,
-	contractRepo repositories.ContractRepository,
-	agreementRepo repositories.AgreementRepository,
-) DashboardService {
+func NewDashboardService(dashboardRepo repositories.DashboardRepository) DashboardService {
 	return &dashboardService{
-		propertyRepo:  propertyRepo,
-		assetRepo:     assetRepo,
-		contractRepo:  contractRepo,
-		agreementRepo: agreementRepo,
+		dashboardRepo: dashboardRepo,
 	}
 }
 
-func (s *dashboardService) TotalPropertyCount(ctx context.Context) (int64, error) {
-	return s.propertyRepo.Total(ctx)
+// TotalPropertyCount returns total property count for the user
+func (s *dashboardService) TotalPropertyCount(ctx context.Context, userID uint) (int64, error) {
+	return s.dashboardRepo.TotalPropertyCount(ctx, userID)
 }
 
-func (s *dashboardService) TotalAssetCount(ctx context.Context) (int64, error) {
-	return s.assetRepo.CountAll(ctx)
+// TotalAssetCount returns total asset count for the user
+func (s *dashboardService) TotalAssetCount(ctx context.Context, userID uint) (int64, error) {
+	return s.dashboardRepo.TotalAssetCount(ctx, userID)
 }
 
-func (s *dashboardService) TotalAMCContractCount(ctx context.Context) (int64, error) {
-	return s.contractRepo.CountByType(ctx, "amc")
+// TotalAMCContractCount returns total AMC contract count for the user
+func (s *dashboardService) TotalAMCContractCount(ctx context.Context, userID uint) (int64, error) {
+	return s.dashboardRepo.TotalAMCContractCount(ctx, userID)
 }
 
-func (s *dashboardService) TotalActiveRentalCount(ctx context.Context) (int64, error) {
-	return s.propertyRepo.ActiveRentalCount(ctx)
+// TotalActiveRentalCount returns total active rental count for the user
+func (s *dashboardService) TotalActiveRentalCount(ctx context.Context, userID uint) (int64, error) {
+	return s.dashboardRepo.TotalActiveRentalCount(ctx, userID)
 }
 
+// RecentActivities returns recent activities for the user
 func (s *dashboardService) RecentActivities(ctx context.Context, userID uint) ([]models.ActivityItem, error) {
 	const limit = 6
-
-	propertyItems, err := s.propertyRepo.RecentByUser(ctx, userID, limit)
-	if err != nil {
-		return nil, err
-	}
-	assetItems, err := s.assetRepo.RecentByUser(ctx, userID, limit)
-	if err != nil {
-		return nil, err
-	}
-	contractItems, err := s.contractRepo.RecentByUser(ctx, userID, limit)
-	if err != nil {
-		return nil, err
-	}
-	agreementItems, err := s.agreementRepo.RecentByUser(ctx, userID, limit)
-	if err != nil {
-		return nil, err
-	}
-
-	items := make([]models.ActivityItem, 0, len(propertyItems)+len(assetItems)+len(contractItems)+len(agreementItems))
-	items = append(items, propertyItems...)
-	items = append(items, assetItems...)
-	items = append(items, contractItems...)
-	items = append(items, agreementItems...)
-
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].TimeCreated.After(items[j].TimeCreated)
-	})
-
-	if len(items) > limit {
-		items = items[:limit]
-	}
-
-	return items, nil
+	return s.dashboardRepo.RecentActivities(ctx, userID, limit)
 }

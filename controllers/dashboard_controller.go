@@ -20,13 +20,25 @@ func NewDashboardController(svc services.DashboardService) *DashboardController 
 }
 
 // GetTotalPropertyCount godoc
-// @Summary Get total property count
+// @Summary Get total property count for the user
 // @Tags Dashboard
 // @Produce json
 // @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
 // @Router /api/v1/dashboard/total-properties [get]
 func (d *DashboardController) GetTotalPropertyCount(c *gin.Context) {
-	count, err := d.svc.TotalPropertyCount(c.Request.Context())
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	userID, ok := userIDValue.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	count, err := d.svc.TotalPropertyCount(c.Request.Context(), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -35,13 +47,25 @@ func (d *DashboardController) GetTotalPropertyCount(c *gin.Context) {
 }
 
 // GetTotalAssetCount godoc
-// @Summary Get total asset count
+// @Summary Get total asset count for the user
 // @Tags Dashboard
 // @Produce json
 // @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
 // @Router /api/v1/dashboard/total-assets [get]
 func (d *DashboardController) GetTotalAssetCount(c *gin.Context) {
-	count, err := d.svc.TotalAssetCount(c.Request.Context())
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	userID, ok := userIDValue.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	count, err := d.svc.TotalAssetCount(c.Request.Context(), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -50,13 +74,25 @@ func (d *DashboardController) GetTotalAssetCount(c *gin.Context) {
 }
 
 // GetTotalAMCContractCount godoc
-// @Summary Get total AMC contract count
+// @Summary Get total AMC contract count for the user
 // @Tags Dashboard
 // @Produce json
 // @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
 // @Router /api/v1/dashboard/total-amc-contracts [get]
 func (d *DashboardController) GetTotalAMCContractCount(c *gin.Context) {
-	count, err := d.svc.TotalAMCContractCount(c.Request.Context())
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	userID, ok := userIDValue.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	count, err := d.svc.TotalAMCContractCount(c.Request.Context(), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -65,13 +101,25 @@ func (d *DashboardController) GetTotalAMCContractCount(c *gin.Context) {
 }
 
 // GetTotalActiveRentalCount godoc
-// @Summary Get total active rental count
+// @Summary Get total active rental count for the user
 // @Tags Dashboard
 // @Produce json
 // @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
 // @Router /api/v1/dashboard/active-rental-count [get]
 func (d *DashboardController) GetTotalActiveRentalCount(c *gin.Context) {
-	count, err := d.svc.TotalActiveRentalCount(c.Request.Context())
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	userID, ok := userIDValue.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	count, err := d.svc.TotalActiveRentalCount(c.Request.Context(), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

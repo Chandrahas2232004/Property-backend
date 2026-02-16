@@ -185,13 +185,25 @@ func (p *PropertyController) UploadPropertyFiles(c *gin.Context) {
 }
 
 // AgriculturalLandProperties godoc
-// @Summary List agricultural land properties
+// @Summary List agricultural land properties for the user
 // @Tags Properties
 // @Produce json
 // @Success 200 {array} models.Property
+// @Failure 401 {object} map[string]interface{}
 // @Router /api/v1/properties/agricultural [get]
 func (p *PropertyController) AgriculturalLandProperties(c *gin.Context) {
-	props, err := p.svc.ListByType(context.Background(), "agricultural")
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	userID, ok := userIDValue.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	props, err := p.svc.ListByTypeByUser(context.Background(), "agricultural", userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -200,13 +212,25 @@ func (p *PropertyController) AgriculturalLandProperties(c *gin.Context) {
 }
 
 // ResidentialLandProperties godoc
-// @Summary List residential land properties
+// @Summary List residential land properties for the user
 // @Tags Properties
 // @Produce json
 // @Success 200 {array} models.Property
+// @Failure 401 {object} map[string]interface{}
 // @Router /api/v1/properties/residential [get]
 func (p *PropertyController) ResidentialLandProperties(c *gin.Context) {
-	props, err := p.svc.ListByType(context.Background(), "residential")
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	userID, ok := userIDValue.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	props, err := p.svc.ListByTypeByUser(context.Background(), "residential", userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -215,13 +239,25 @@ func (p *PropertyController) ResidentialLandProperties(c *gin.Context) {
 }
 
 // CommercialLandProperties godoc
-// @Summary List commercial land properties
+// @Summary List commercial land properties for the user
 // @Tags Properties
 // @Produce json
 // @Success 200 {array} models.Property
+// @Failure 401 {object} map[string]interface{}
 // @Router /api/v1/properties/commercial [get]
 func (p *PropertyController) CommercialLandProperties(c *gin.Context) {
-	props, err := p.svc.ListByType(context.Background(), "commercial")
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	userID, ok := userIDValue.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	props, err := p.svc.ListByTypeByUser(context.Background(), "commercial", userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -230,15 +266,27 @@ func (p *PropertyController) CommercialLandProperties(c *gin.Context) {
 }
 
 // GetAllProperties godoc
-// @Summary Get all properties
-// @Description Retrieve all properties with complete details including address, land details, tax details, media, and ownership information
+// @Summary Get all properties for the user
+// @Description Retrieve all properties for the authenticated user with complete details including address, land details, tax details, media, and ownership information
 // @Tags Properties
 // @Produce json
 // @Success 200 {object} PropertyListResponse
+// @Failure 401 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /api/v1/properties [get]
 func (p *PropertyController) GetAllProperties(c *gin.Context) {
-	props, err := p.svc.GetAll(context.Background())
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	userID, ok := userIDValue.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	props, err := p.svc.GetAllByUser(context.Background(), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
